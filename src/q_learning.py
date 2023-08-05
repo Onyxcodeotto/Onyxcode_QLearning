@@ -41,6 +41,8 @@ class Game():
             return 1
         else:
             return -1
+    def getCoor(self):
+        return self.currState
 
 class Model():
     # A hardcoded model for solving a custom made game
@@ -50,7 +52,7 @@ class Model():
         self.maxIter = maxIter
         self.env = Game()
         self.eps = 1
-        self.decay = 0.005
+        self.decay = decay
         self.alpha = learningRate
         self.gamma = 0.8
     
@@ -69,38 +71,37 @@ class Model():
         
     def train(self):
         for episode in range(self.nEpisode):
-            print(f"episode {episode}")
+            # print(f"episode {episode}")
             self.env.reset()
             eps = self.eps - self.decay*episode
             for iteration in range(self.maxIter):
-                print(f"iteration {iteration}")
+                # print(f"iteration {iteration}")
                 # Pick an action
                 previous_state = self.env.currState
                 action = self.epsGreedy(eps)
                 reward, condition = self.env.take_action(action)
                 self.qTable[previous_state,self.ReLu(action)] = reward + \
                     self.alpha*( reward+self.gamma*max(self.qTable[self.env.currState]) - self.qTable[previous_state,self.ReLu(action)])
-                print(self.qTable)
                 if condition:
                     break
                 
     
     def autoplay(self):
         self.env.reset()
-        steps = []
+        self.path = []
         condition = 0
         while not condition:
-            print(self.env.currState)
-            print(self.env.reward)
-        
             action = self.epsGreedy(0)
-            steps.append(action)
+            
+            self.path.append(self.env.getCoor())
             _, condition = self.env.take_action(action=action)
-        print(steps)
+    def printResult(self):
+        print("Path: ",end = "")
+        for i in self.path:
+            print(i,end="->")
+        print("Finish")
+        print(f"Q-Table: \n{self.qTable}")
+                        
+                
+                
     
-    def printQTable(self):
-        pass
-                
-                
-                
-        
